@@ -6,7 +6,7 @@
 Standard Molecular Backscatter Coefficient
 }
 \description{
-Standard Molecular Backscatter Soefficient according to Standard Atmosphere and wavelength-
+Standard Molecular Volume Backscatter Coefficient according to Standard Atmosphere for different wavelength-
 }
 \usage{
 betamol_standard(z, lambda = 1064, T0 = 288.15, P0 = 101325, R0 = 1.225)
@@ -14,7 +14,7 @@ betamol_standard(z, lambda = 1064, T0 = 288.15, P0 = 101325, R0 = 1.225)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{z}{
-   Vector, Matix or scalar of alitude over see level [m].
+   Vector, Matix or scalar of altitude over see level [m].
 }
   \item{lambda}{
     Scalar value in nm. It represent the wavelength of incident light.
@@ -31,7 +31,7 @@ betamol_standard(z, lambda = 1064, T0 = 288.15, P0 = 101325, R0 = 1.225)
 }
 
 \value{
-Returns according to the dimensions of z values of elastic backscatter coefficents in [1/(m sr)]
+Returns according to the dimensions of z values of elastic volume backscatter coefficients in [1/(m sr)]
 }
 
 \author{
@@ -45,7 +45,10 @@ Gionata Biavati
 \examples{
   lambda=1064 #nm
   z<-10*(0:1000)
-  plot(betamol_standard(z),z,type='l',col=4,lwd=3,xlab='Backscatter Coefficent [1/(m sr)]',ylab='Altitude [m]',main ='backscatter coefficient')
+  plot(betamol_standard(z),z,type='l',col=4,lwd=3,
+       xlab='volume Backscatter Coefficient [1/(m sr)]',
+       ylab='Altitude [m]',
+       main ='volume backscatter coefficient')
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

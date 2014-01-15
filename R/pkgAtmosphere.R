@@ -7,8 +7,8 @@ standard_atmosphere<-function(z,vout=3,T0=288.15,P0=101325,R0=1.225){
   # parameter vout has default value 3
   #  1 for temperature, 2 for pressure, 3 for density
 
-  level0<-c(0,11,20,32,47,51) *1000
-  level1<-c(11,20,32,47,51,71)*1000
+  level0<-c(0,11,20,32,47,51) *1000.
+  level1<-c(11,20,32,47,51,71)*1000.
 
   func<-vector("list",length=3)#ncol=3,nrow=3)
   func[[1]]<-vector("list",length=6)#ncol=3,nrow=3)
@@ -44,10 +44,10 @@ standard_atmosphere<-function(z,vout=3,T0=288.15,P0=101325,R0=1.225){
 }
 
 
-betamol<-function(P,T,lambda=1064)2.938*10^4.1053*P/T/lambda^4.0117
+betamol<-function(P,T,lambda=1064.)2.938*10^4.1053*P/T/lambda^4.0117
 
-betamol_standard<-function(z,lambda=1064,T0=288.15,P0=101325,R0=1.225){
-betamol(standard_atmosphere(z,vout=2,T0=T0,P0=P0,R0=R0)/100,standard_atmosphere(z,vout=1,T0=T0,P0=P0,R0=R0),lambda=lambda)
+betamol_standard<-function(z,lambda=1064.,T0=288.15,P0=101325.,R0=1.225){
+betamol(standard_atmosphere(z,vout=2,T0=T0,P0=P0,R0=R0)/100.,standard_atmosphere(z,vout=1,T0=T0,P0=P0,R0=R0),lambda=lambda)
 
 }
 
@@ -59,36 +59,40 @@ SZA<-function(timein=Sys.time(),Lat = 50.910335,Lon = 11.568740){
 #( hour, minute, second, dummy, n ) = time.gmtime()[3:8]
 # Calculate declination of the sun d
 #if (is.vector(timein)){
+
  sza<-vector("numeric",length=length(timein))
   for(i in 1:length(timein)){
-    time<-as.POSIXlt(timein[i])
-d<-23.45 * pi / 180 * sin(2 * pi * (284 + time$yday) / 365) # [rad]
+    time<-as.POSIXlt(timein[i],tz='GMT')
+d2r=pi/180.
+r2d=1./d2r
+d<-23.45 * d2r * sin(d2r *360. *(284. + time$yday) / 365.) # [rad]
 #print (sprintf("d = %f", d * 180 / pi))
 # Calculate equation of time
 if (time$yday <= 106){
-    E_qt <- -14.2 * sin(pi * (time$yday + 7) / 111)      # Eq. SR.4a [minutes]
+    E_qt <- -14.2 * sin(pi * (time$yday + 7.) / 111.)      # Eq. SR.4a [minutes]
 }else{if (time$yday<= 166){
-    E_qt <-   4.0 * sin(pi * (time$yday - 106) / 59)     # Eq. SR.4b [minutes]
+    E_qt <-   4.0 * sin(pi * (time$yday - 106.) / 59.)     # Eq. SR.4b [minutes]
 }else{if (time$yday<= 246){
-    E_qt <-  -6.5 * sin(pi * (time$yday - 166) / 80)     # Eq. SR.4c [minutes]
-}else{E_qt <-  16.4 * sin(pi * (time$yday - 247) / 113)}}}    # Eq. SR.4d [minutes]
+    E_qt <-  -6.5 * sin(pi * (time$yday - 166.) / 80.)     # Eq. SR.4c [minutes]
+}else{E_qt <-  16.4 * sin(pi * (time$yday - 247.) / 113.)}}}    # Eq. SR.4d [minutes]
 # Get UTC time T
 T<-time$hour + time$min / 60.0 + time$sec / 3600.0 # [hours]
 # Calculate solar time T_solar (East longitudes are positive!)
-T_solar<-T + Lon / 15 + E_qt / 60 # [hours]
+Longitude<-Lon#*d2r
+T_solar<-T + Longitude / 15. + E_qt / 60. # [hours]
 # Calculate hour angle w (positive: from midnight to noon, negative: from noon to midnight)
-w<-pi * (12 - T_solar) / 12 # [rad]
+w<-pi * (12. - T_solar) / 12. # [rad]
 # Calculate solar zenith angle Z
-l<-Lat * pi / 180 # [rad]
+l<-Lat * d2r # [rad]
 
-sza[i]<-acos(sin(l) * sin(d) + cos(l) * cos(d) * cos(w)) * 180 / pi # [deg]
+sza[i]<-90.-asin(sin(l) * sin(d) + cos(l) * cos(d) * cos(w)) * r2d # [deg]
 
   }
 #}
 return(sza)
 }
 
-suncalc<-function(d,Lat=0.,Long=0.,UTC=FALSE){
+suncalc<-function(d,Lat=0.,Long=0.,UTC=TRUE){
   ## d is the day of year
   ## Lat is latitude in decimal degrees
   ## Long is longitude in decimal degrees (negative == West)
@@ -102,10 +106,10 @@ suncalc<-function(d,Lat=0.,Long=0.,UTC=FALSE){
   ## with a mean of 2.4 minutes error.
 
   ## Function to convert degrees to radians
-  rad<-function(x)pi*x/180
+  rad<-function(x)pi*x/180.
 
   ##Radius of the earth (km)
-  R=6378
+  R=6378.
 
   ##Radians between the xy-plane and the ecliptic plane
   epsilon=rad(23.45)
@@ -117,31 +121,35 @@ suncalc<-function(d,Lat=0.,Long=0.,UTC=FALSE){
   ## If Long is negative, then the mod represents degrees West of
   ## a standard time meridian, so timing of sunrise and sunset should
   ## be made later.
-  timezone = -4*(abs(Long)%%15)*sign(Long)
+  if (UTC){
+           timezone = 0
+	   }else{
+		   timezone =-4*(abs(Long)%%15)*sign(Long)
+	   }
 
   ## The earth's mean distance from the sun (km)
-  r = 149598000
+  r = 149598000.
 
-  theta = 2*pi/365.25*(d-80)
+  theta = 2*pi/365.25*(d-80.)
 
   z.s = r*sin(theta)*sin(epsilon)
   r.p = sqrt(r^2-z.s^2)
 
-  t0 = 1440/(2*pi)*acos((R-z.s*sin(L))/(r.p*cos(L)))
+  t0 = 1440./(2.*pi)*acos((R-z.s*sin(L))/(r.p*cos(L)))
 
   ##a kludge adjustment for the radius of the sun
-  that = t0+5
+  that = t0+5.
 
   ## Adjust "noon" for the fact that the earth's orbit is not circular:
-  n = 720-10*sin(4*pi*(d-80)/365.25)+8*sin(2*pi*d/365.25)
+  n = 720.-10.*sin(4*pi*(d-80)/365.25)+8.*sin(2.*pi*d/365.25)
 
   ## now sunrise and sunset are:
   if(UTC){
-  sunrise = (n-that)/60
-  sunset = (n+that)/60
+  sunrise = (n-that)/60.
+  sunset = (n+that)/60.
 }else{
-  sunrise = (n-that+timezone)/60
-  sunset = (n+that+timezone)/60
+  sunrise = (n-that+timezone)/60.
+  sunset = (n+that+timezone)/60.
 }
 
   return(list("sunrise" = sunrise,"sunset" = sunset))

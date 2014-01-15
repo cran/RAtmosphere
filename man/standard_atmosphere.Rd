@@ -6,7 +6,7 @@
 Standard Atmosphere calculations
 }
 \description{
-This function calculate the Temperature,Presure and density of air at a fixed quota, according to ground temperature, density and pressure. The profile is a standard atmospheric profile according to 1976 Standard Atmosphere.
+This function calculate Temperature, Pressure and Density of air at a fixed quota, according to ground temperature, density and pressure. The profile is a standard atmospheric profile according to 1976 Standard Atmosphere.
 }
 \usage{
 standard_atmosphere(z, vout = 3, T0 = 288.15, P0 = 101325, R0 = 1.225)
@@ -44,7 +44,8 @@ According to input z the function will return a Vector, a Matrix or a Scalar val
 Gionata Biavati
 }
 \note{
-This function is preety general, no latitude-longitude or seasonal specification. It is necessary to evaluate a standard backscatter profile.
+This function is general, no latitude-longitude or seasonal specification. 
+It is necessary to evaluate a standard backscatter profile.
 }
 
 \seealso{

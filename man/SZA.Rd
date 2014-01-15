@@ -4,7 +4,7 @@
 \title{Solar Zenith Angle
 }
 \description{
-This function provide Solar Zenith Angle for a specificated time, latitude and longitude.
+This function provide Solar Zenith Angle for a specified time , latitude and longitude.
 }
 \usage{
 SZA(timein = Sys.time(), Lat = 50.910335, Lon = 11.56874)
@@ -12,7 +12,7 @@ SZA(timein = Sys.time(), Lat = 50.910335, Lon = 11.56874)
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{timein}{
-   default value is the system time. It will consider all entries "POSIXct" "POSIXt" and string format as in UTC. It can be a vector, a scalar or a matrix.
+   default value is the system time. It will consider all entries "POSIXct" "POSIXt" and string format with time zone. It can be a vector, a scalar or a matrix.
 }
   \item{Lat}{
    Scalar. Latitude in [°N] as decimal It is the latitude of the site considered.
@@ -23,7 +23,7 @@ SZA(timein = Sys.time(), Lat = 50.910335, Lon = 11.56874)
 }
 
 \value{
-A vector, matrix or scalar according to the input timein, with values of SZA in °deg in decimal values.
+A vector, matrix or scalar according to the input timein, with values of SZA in decimal °deg.
 }
 \references{
 url{http://solardat.uoregon.edu/SolarRadiationBasics.html}
@@ -40,7 +40,10 @@ Gionata Biavati
 ##  calculate SZA
 sza<-SZA('2010-01-01 12:00',Lat=0,Lon=0)
 t<-Sys.time()+seq(-3600*12,3600*12,,by=1800)
-plot(t,SZA(t,Lat=0,Lon=0),main='SZA',xlab='Time',ylab='SZA [°deg]')
+plot(t,SZA(t,Lat=0,Lon=0),
+       main='SZA',
+       xlab='Time',
+       ylab='SZA [°deg]')
 }
 
 \keyword{ solar }
